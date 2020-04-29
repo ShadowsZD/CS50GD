@@ -40,9 +40,17 @@ function love.load()
 end
 
 function love.update(dt)
-    if gameState == 'play' then
+    if gameState == 'serve' then
+        ball.dy = math.random(-50, 50)
+
+        if servingPlayer == 1 then
+            ball.dx = math.random(140, 200)
+        else 
+            ball.dx = -math.random(140, 200)
+        end
+    elseif gameState == 'play' then
         if ball:collides(player1) then
-            ball.dx = -ball.dx * 1.03
+            ball.dx = -ball.dx * 1.1
             ball.x = player1.x + 5
 
             if ball.dy < 0 then
@@ -53,7 +61,7 @@ function love.update(dt)
         end
         
         if ball:collides(player2) then
-            ball.dx = -ball.dx * 1.03
+            ball.dx = -ball.dx * 1.1
             ball.x = player2.x - 4
 
             if ball.dy < 0 then
@@ -75,6 +83,21 @@ function love.update(dt)
         end
     end
 
+    --Keeping track of score
+    if ball.x < 0 then 
+        servingPlayer = 1
+        scorePlayer2 = scorePlayer2 + 1
+        ball:reset()
+        gameState = 'serve'
+    end
+
+    if ball.x > VIRTUAL_WIDTH then
+        servingPlayer = 2
+        scorePlayer1 = scorePlayer1 + 1
+        ball:reset()
+        gameState = 'serve'
+    end
+    
     --Player 1 movement
     if love.keyboard.isDown('w') then
         player1.dy = -PADDLE_SPEED
