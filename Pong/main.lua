@@ -15,11 +15,11 @@ PADDLE_SPEED = 200
 ]]
 function love.load()
     --uncomment to test stuff
-    love.graphics.setDefaultFilter('nearest', 'nearest')
+    --love.graphics.setDefaultFilter('nearest', 'nearest')
     love.window.setTitle('Pong')
     math.randomseed(os.time())
-    --smallFont = love.graphics.newFont('font.ttf', 8)
-    --love.graphics.setFont(smallFont)
+    smallFont = love.graphics.newFont('font.ttf', 8)
+    love.graphics.setFont(smallFont)
     --setup window with push, converts the window res to virtual res, test with higher virtual size
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDHT, WINDOW_HEIGHT,{
         fullscreen = false,
@@ -36,7 +36,7 @@ function love.load()
     --place ball in the middle of screen
     ball = Ball(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
 
-    gameState = 'start'
+    gameState = 'menu'
 end
 
 function love.update(dt)
@@ -81,6 +81,8 @@ function love.update(dt)
             ball.y = VIRTUAL_HEIGHT - 4
             ball.dy = -ball.dy
         end
+    elseif gameState == 'menu' then
+        
     end
 
     --Keeping track of score
@@ -126,13 +128,18 @@ end
 
 function love.keypressed(key)
     if key == 'escape' then
-        love.event.quit()
+        if(gameState == 'menu') then
+            love.event.quit()
+        else 
+            love.event.quit()
+        end
     elseif key == 'enter' or key == 'return' then
-        if gameState == 'start' then
+        if gameState == 'start' or gameState == 'serve' then
             gameState = 'play'
-        else
+        elseif gameState == 'menu' then
+            gameState = 'menu'
+        else    
             gameState = 'start'
-
             ball:reset()
         end
     end
@@ -142,20 +149,57 @@ function love.draw()
     push:apply('start')         --whatever between start and end gets out with virtual res
     --love.graphics.clear(40, 45, 52, 255)
     love.graphics.printf(   
-        'Pong',              --text to render
-        0,                      --STARTING X
-        20,  --STARTING Y (-6 because font is 12px tall)
-        VIRTUAL_WIDTH,           --n of pixel to center within
-        'center')               --alignment mode (center,left,right)
-    love.graphics.print(tostring(scorePlayer1), VIRTUAL_WIDTH / 2 - 50, VIRTUAL_HEIGHT/3)
-    love.graphics.print(tostring(scorePlayer2), VIRTUAL_WIDTH / 2 + 30, VIRTUAL_HEIGHT/3)
-    player1:render()
-    player2:render()
-    ball:render()
+            'Pong',                 --text to render
+            0,                      --STARTING X
+            20,                     --STARTING Y (-6 because font is 12px tall)
+            VIRTUAL_WIDTH,          --n of pixel to center within
+            'center'                --alignment mode (center,left,right)
+    )
+    if(gameState == 'start' or gameState == 'play' or gameState == 'serve') then               
+        love.graphics.print(tostring(scorePlayer1), VIRTUAL_WIDTH / 2 - 50, VIRTUAL_HEIGHT/3)
+        love.graphics.print(tostring(scorePlayer2), VIRTUAL_WIDTH / 2 + 30, VIRTUAL_HEIGHT/3)
+        player1:render()
+        player2:render()
+        ball:render()
+        --displayFPS()
+    else 
+        startMenu()
+    end
     push:apply('end')
 end
 
 function displayFPS()
     love.graphics.setColor(0, 255, 0, 255)
     love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 10)
+end
+
+function startMenu()
+    if (gameState == 'menu') then
+        push:apply('start')
+        --love.graphics.clear(40, 45, 52, 255)   
+        --add diff font for menu options       
+        --add triangle to indicate menu option hovered   
+        love.graphics.printf(
+            'Start Game',
+            0,
+            100,
+            VIRTUAL_WIDTH,
+        'center'
+        )
+        love.graphics.printf(
+            'Options',
+            0,
+            108,
+            VIRTUAL_WIDTH,
+        'center'
+        )
+        love.graphics.printf(
+            'Exit',
+            0,
+            116,
+            VIRTUAL_WIDTH,
+        'center'
+        )
+        push:apply('end')
+    end
 end
