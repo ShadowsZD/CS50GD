@@ -175,30 +175,34 @@ end
 
 function startMenu()
     if (gameState == 'menu') then
+        love.graphics.polygon('fill', VIRTUAL_WIDTH / 2 - 30, 110, VIRTUAL_WIDTH / 2 - 30, 100, VIRTUAL_WIDTH / 2 - 25, 105)
         push:apply('start')
+        menuPos = 0
+        --arrowPos
         --love.graphics.clear(40, 45, 52, 255)   
+        --test
         --add diff font for menu options       
         --add triangle to indicate menu option hovered   
         love.graphics.printf(
-            'Start Game',
+            'Start',
             0,
             100,
             VIRTUAL_WIDTH,
-        'center'
+            'center'
         )
         love.graphics.printf(
             'Options',
             0,
             108,
             VIRTUAL_WIDTH,
-        'center'
+            'center'
         )
         love.graphics.printf(
             'Exit',
             0,
             116,
             VIRTUAL_WIDTH,
-        'center'
+            'center'
         )
         push:apply('end')
     end
