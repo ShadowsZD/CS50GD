@@ -18,8 +18,8 @@ function love.load()
     --love.graphics.setDefaultFilter('nearest', 'nearest')
     love.window.setTitle('Pong')
     math.randomseed(os.time())
-    smallFont = love.graphics.newFont('font.ttf', 8)
-    love.graphics.setFont(smallFont)
+    --smallFont = love.graphics.newFont('font.ttf', 8)
+    --love.graphics.setFont(smallFont)
     --setup window with push, converts the window res to virtual res, test with higher virtual size
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDHT, WINDOW_HEIGHT,{
         fullscreen = false,
@@ -44,9 +44,9 @@ function love.update(dt)
         ball.dy = math.random(-50, 50)
 
         if servingPlayer == 1 then
-            ball.dx = math.random(140, 200)
+            ball.dx = math.random(190, 200)
         else 
-            ball.dx = -math.random(140, 200)
+            ball.dx = -math.random(190, 200)
         end
     elseif gameState == 'play' then
         if ball:collides(player1) then
@@ -137,10 +137,24 @@ function love.keypressed(key)
         if gameState == 'start' or gameState == 'serve' then
             gameState = 'play'
         elseif gameState == 'menu' then
-            gameState = 'menu'
+            gameState = 'start'
         else    
             gameState = 'start'
             ball:reset()
+        end
+    elseif key == 'up' then
+        if gameState == 'menu' then
+            if menuOp == 2 then
+                menuOp = 0
+            else menuOp = menuOp + 1
+            end
+        end
+    elseif key == 'down' then
+        if gameState == 'menu' then
+            if menuOp == 0 then
+                menuOp = 3
+            else menuOp = menuOp - 1
+            end
         end
     end
 end
@@ -177,8 +191,8 @@ function startMenu()
     if (gameState == 'menu') then
         love.graphics.polygon('fill', VIRTUAL_WIDTH / 2 - 30, 110, VIRTUAL_WIDTH / 2 - 30, 100, VIRTUAL_WIDTH / 2 - 25, 105)
         push:apply('start')
-        menuPos = 0
-        --arrowPos
+        menuOp = 0
+        --arrowPos needs to be stored somewhere, 3 points because of triangle
         --love.graphics.clear(40, 45, 52, 255)   
         --test
         --add diff font for menu options       
@@ -193,14 +207,14 @@ function startMenu()
         love.graphics.printf(
             'Options',
             0,
-            108,
+            115,
             VIRTUAL_WIDTH,
             'center'
         )
         love.graphics.printf(
             'Exit',
             0,
-            116,
+            130,
             VIRTUAL_WIDTH,
             'center'
         )
