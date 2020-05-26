@@ -36,6 +36,12 @@ function love.load()
     --place ball in the middle of screen
     ball = Ball(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
 
+    --arrowPos
+    points = { VIRTUAL_WIDTH / 2 - 50, 112, VIRTUAL_WIDTH / 2 - 50, 102, VIRTUAL_WIDTH/ 2 - 30 , 107 } 
+    menuOp = 0
+
+
+
     gameState = 'menu'
 end
 
@@ -122,6 +128,7 @@ function love.update(dt)
         ball:update(dt)
     end
 
+
     player1:update(dt)
     player2:update(dt)
 end 
@@ -144,16 +151,38 @@ function love.keypressed(key)
         end
     elseif key == 'up' then
         if gameState == 'menu' then
-            if menuOp == 2 then
-                menuOp = 0
-            else menuOp = menuOp + 1
+            if menuOp ~=0 then
+                menuOp = menuOp - 1
+                for key, value in ipairs( points ) do
+                    if key % 2 == 0 then
+                        points[key] = points[key] - 15
+                    end
+                end
+            else 
+                menuOp = 2
+                for key, value in ipairs( points ) do
+                    if key % 2 == 0 then
+                        points[key] = points[key] + 30 --reset
+                    end
+                end
             end
         end
     elseif key == 'down' then
         if gameState == 'menu' then
-            if menuOp == 0 then
-                menuOp = 3
-            else menuOp = menuOp - 1
+            if menuOp ~= 2 then
+                menuOp = menuOp + 1
+                for key, value in ipairs( points ) do
+                    if key % 2 == 0 then
+                        points[key] = points[key] + 15
+                    end
+                end
+            else
+                menuOp = 0
+                for key, value in ipairs( points ) do
+                    if key % 2 == 0 then
+                        points[key] = points[key] - 30 --reset
+                    end
+                end
             end
         end
     end
@@ -175,9 +204,10 @@ function love.draw()
         player1:render()
         player2:render()
         ball:render()
+
         --displayFPS()
     else 
-        startMenu()
+        startMenu() 
     end
     push:apply('end')
 end
@@ -189,9 +219,9 @@ end
 
 function startMenu()
     if (gameState == 'menu') then
-        love.graphics.polygon('fill', VIRTUAL_WIDTH / 2 - 30, 110, VIRTUAL_WIDTH / 2 - 30, 100, VIRTUAL_WIDTH / 2 - 25, 105)
         push:apply('start')
-        menuOp = 0
+        love.graphics.polygon('fill', points)
+
         --arrowPos needs to be stored somewhere, 3 points because of triangle
         --love.graphics.clear(40, 45, 52, 255)   
         --test
