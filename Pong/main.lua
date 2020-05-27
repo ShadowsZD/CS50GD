@@ -20,6 +20,15 @@ function love.load()
     math.randomseed(os.time())
     --smallFont = love.graphics.newFont('font.ttf', 8)
     --love.graphics.setFont(smallFont)
+
+    sounds = {
+        ['menu_move'] = love.audio.newSource('sounds/menu_move.wav', 'static'),
+        ['menu_slct'] = love.audio.newSource('sounds/menu_slct.wav', 'static'),
+        ['paddle_hit'] = love.audio.newSource('sounds/pad_hit.wav', 'static'),
+        ['score'] = love.audio.newSource('sounds/score.wav', 'static')
+    }
+
+
     --setup window with push, converts the window res to virtual res, test with higher virtual size
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDHT, WINDOW_HEIGHT,{
         fullscreen = false,
@@ -56,6 +65,7 @@ function love.update(dt)
         end
     elseif gameState == 'play' then
         if ball:collides(player1) then
+            sounds.paddle_hit:play()
             ball.dx = -ball.dx * 1.1
             ball.x = player1.x + 5
 
@@ -67,6 +77,7 @@ function love.update(dt)
         end
         
         if ball:collides(player2) then
+            sounds.paddle_hit:play()
             ball.dx = -ball.dx * 1.1
             ball.x = player2.x - 4
 
@@ -93,6 +104,7 @@ function love.update(dt)
 
     --Keeping track of score
     if ball.x < 0 then 
+        sounds.score:play()
         servingPlayer = 1
         scorePlayer2 = scorePlayer2 + 1
         ball:reset()
@@ -100,6 +112,7 @@ function love.update(dt)
     end
 
     if ball.x > VIRTUAL_WIDTH then
+        sounds.score:play()
         servingPlayer = 2
         scorePlayer1 = scorePlayer1 + 1
         ball:reset()
@@ -141,16 +154,25 @@ function love.keypressed(key)
             love.event.quit()
         end
     elseif key == 'enter' or key == 'return' then
+        sounds.menu_slct:play()
         if gameState == 'start' or gameState == 'serve' then
             gameState = 'play'
         elseif gameState == 'menu' then
-            gameState = 'start'
+            if menuOp == 0 then
+                gameState = 'start'
+            elseif menuOp == 1 then
+                gameState = 'options'
+            else
+                love.event.quit()
+            end
         else    
             gameState = 'start'
             ball:reset()
         end
+
     elseif key == 'up' then
         if gameState == 'menu' then
+            sounds.menu_move:play()
             if menuOp ~=0 then
                 menuOp = menuOp - 1
                 for key, value in ipairs( points ) do
@@ -167,8 +189,10 @@ function love.keypressed(key)
                 end
             end
         end
+
     elseif key == 'down' then
         if gameState == 'menu' then
+            sounds.menu_move:play()
             if menuOp ~= 2 then
                 menuOp = menuOp + 1
                 for key, value in ipairs( points ) do
@@ -205,9 +229,11 @@ function love.draw()
         player2:render()
         ball:render()
 
-        --displayFPS()
-    else 
+        displayFPS()
+    elseif gameState == 'menu' then
         startMenu() 
+    else
+        optionsMenu()
     end
     push:apply('end')
 end
@@ -250,4 +276,16 @@ function startMenu()
         )
         push:apply('end')
     end
+end
+
+function optionsMenu()
+    push:apply('start')
+    love.graphics.printf(
+        'Options',
+        0,
+        100,
+        VIRTUAL_WIDTH,
+        'center'
+    )
+    push:apply('end')
 end
